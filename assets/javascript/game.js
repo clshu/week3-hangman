@@ -1,15 +1,33 @@
 // Global Variables
 var dict = ["Google", "Lion", "Cheetah", "Apocalypse"];
-var isNewNewGame = true;
-var isRestart = false;
+var isNewNewGame = true;[]
 var randomIndex = -1;
 var userInput = null;
+var winCount = 0;
+var lossCount = 0;
 // Constant
 var maxGuessNumber = 20;
+var marker = '_'; // mark the positions that are not matched yet
+var winMessage = "You Won! Hit any key to restart.";
+var lossMessage = "You Lost! + Hit any key to restart";
 
 // Functions
 function display(sel, html) {
 	document.querySelector(sel).innerHTML = html;
+}
+function createEndMessage(result) {
+	var message = '';
+	if (result == "win") {
+		message = winMessage;
+	} else if ("loss") {
+		message = lossMessage;
+	} else {
+		message = "Argumnet error: " + result;
+	}
+	message += "<br>Wins: " + winCount;
+	message += "<br>Losses: " + lossCount;
+
+	return message;
 }
 // Copied from mozilla developer network
 // Generate random integer between min(included) and max (excluded)
@@ -22,22 +40,30 @@ function getRandomInt(min, max) {
 function Game(word) {
 	this.answer = word.toLowerCase().split("");
 	this.guesses = []; // letters have been guessed stored here
-	this.answerDisplay = []; // display answer or '_'
+	this.answerDisplay = []; // holds matched letters or '_' with blanks in between
 	this.count = maxGuessNumber;
 	this.message = '';
-	this.initialize = function() {
-		// set a [_, _, _, ...] array
+	this.initialize = function() {	
+		// markers mark down the positions that haven't been matched yet
+		// no letter has been matched yet in the beginning 
+		// so every letter position is marked
+		// 
 		for (var i = 0; i < this.answer.length; i++) {
-			this.answerDisplay.push('_');
+			// set a [_,  , _,  ,..] array
+			// insert a blank in betwen letters for display purpose
+			// so only even number positions hold letters or markers
+			this.answerDisplay.push(marker);
+			this.answerDisplay.push(' ');
 		}
 	};
 	// find all occurences of ch in answer, if found,
-	// replaced '_' with ch in answerDisplay accordingly
+	// replace marker with ch in answerDisplay accordingly
 	this.find = function(ch) {
 		var isFound = false;
 		for (var i = 0; i < this.answer.length; i++) {
 			if (ch == this.answer[i]) {
-				this.answerDisplay[i] = ch;
+				// even number positions hold letters
+				this.answerDisplay[i*2] = ch;
 				isFound = true;
 			}
 		}
@@ -47,10 +73,10 @@ function Game(word) {
 	this.isNotGuessed = function(ch) {
 		return (this.guesses.indexOf(ch) == -1);
 	}
-	// The answer is matched if all '_' are replaced with
-	// correct letters and no '_' exists in answerDisplay
+	// The answer is matched if all markers are replaced with
+	// correct letters and no marker found in answerDisplay
 	this.isMatched = function() {
-		return (this.answerDisplay.indexOf('_') == -1);
+		return (this.answerDisplay.indexOf(marker) == -1);
 	}
 
 	// set initial values
@@ -66,20 +92,15 @@ document.onkeyup = function(event) {
 		isNewNewGame = false;
 		randomIndex = getRandomInt(0, dict.length);
 		game = new Game(dict[randomIndex]);
-	}
-
-	if (isRestart) {
-
 		// Don't start to count the number, run game logic yet
-		// because this is a key stroke to restart a new game
-		isRestart = false;
+		// because this is a key stroke to start a new game
+		game.message = "Game started ...";
 	
 	} else {
-
-		// if the letter has not been guessed, run game logic
+		// if the letter has not been guessed, then run game logic
 		// otherwise, do nothing
 		if (game.isNotGuessed(userInput)) {
-			//console.log("isNotGuessed: " + game.isNotGuessed(userInput));
+			game.message = "Continuing ......";
 			game.count--;
 			game.guesses.push(userInput);
 			// find the letter in answer, if found, also replace '_' with
@@ -88,17 +109,15 @@ document.onkeyup = function(event) {
 
 			// if letter is found in answer,
 			// and all letters match answer
-	
 			if (isFound && game.isMatched()) {
-				//console.log("isMatched: " + game.isMatched());
-				game.message = "You Won! Hit any key to restart.";
+				winCount++;
+				game.message = createEndMessage("win");
 				isNewNewGame = true;
-				isRestart = true;
+		
 			} else if (game.count == 0) {
-				game.message = "You Lost! The answer is: " + game.answer.join("") +
-								"<br> Hit any key to restart";
+				lossCount++;
+				game.message = createEndMessage("loss");
 				isNewNewGame = true;
-				isRestart = true;
 			}
 		}
 	}
