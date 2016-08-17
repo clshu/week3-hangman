@@ -103,7 +103,7 @@ document.onkeyup = function(event) {
 			game.message = "Continuing ......";
 			game.count--;
 			game.guesses.push(userInput);
-			// find the letter in answer, if found, also replace '_' with
+			// find the letter in answer, if found, also replace marker with
 			// the letter in answerDisplay
 			var isFound = game.find(userInput);
 
