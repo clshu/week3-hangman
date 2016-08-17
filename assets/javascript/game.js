@@ -1,6 +1,7 @@
 // Global Variables
 var dict = ["Google", "Lion", "Cheetah", "Apocalypse"];
 var isNewNewGame = true;
+var isRestart = false;
 var randomIndex = -1;
 var userInput = null;
 // Constant
@@ -20,8 +21,8 @@ function getRandomInt(min, max) {
 // Class
 function Game(word) {
 	this.answer = word.toLowerCase().split("");
-	this.guesses = [];
-	this.answerDisplay = [];
+	this.guesses = []; // letters have been guessed stored here
+	this.answerDisplay = []; // display answer or '_'
 	this.count = maxGuessNumber;
 	this.message = '';
 	this.initialize = function() {
@@ -42,6 +43,15 @@ function Game(word) {
 		}
 		return isFound;
 	};
+	// The letter is not guessed if it can't be found in guessess
+	this.isNotGuessed = function(ch) {
+		return (this.guesses.indexOf(ch) == -1);
+	}
+	// The answer is matched if all '_' are replaced with
+	// correct letters and no '_' exists in answerDisplay
+	this.isMatched = function() {
+		return (this.answerDisplay.indexOf('_') == -1);
+	}
 
 	// set initial values
 	this.initialize();
@@ -52,33 +62,47 @@ document.onkeyup = function(event) {
 
 	userInput = String.fromCharCode(event.keyCode).toLowerCase();
 
-	if (isNewNewGame == true) {
+	if (isNewNewGame) {
 		isNewNewGame = false;
 		randomIndex = getRandomInt(0, dict.length);
 		game = new Game(dict[randomIndex]);
 	}
 
-	// if the letter has not been guessed
-	if (game.guesses.indexOf(userInput) == -1) {
-		game.count--;
-		game.guesses.push(userInput);
-		// find the letter in answer, if foound, also replace '_' with
-		// the letter in answerDisplay
-		var isFound = game.find(userInput);
-		console.log("isFound: " + isFound);
-		// if letter is found in answer, see if all letters
-		// matched, i.e. all '_' have been replaced with correct letters 
-		// in answerDisplay
+	if (isRestart) {
+
+		// Don't start to count the number, run game logic yet
+		// because this is a key stroke to restart a new game
+		isRestart = false;
 	
-		if (isFound == true && game.answerDisplay.indexOf('_') == -1) {
-			game.message = "You Won!";
-			isNewNewGame = true;
-		} else if (game.count == 0) {
-			game.message = "You Lost! The answer is: " + game.answer.join("");
-			isNewNewGame = true;
+	} else {
+
+		// if the letter has not been guessed, run game logic
+		// otherwise, do nothing
+		if (game.isNotGuessed(userInput)) {
+			//console.log("isNotGuessed: " + game.isNotGuessed(userInput));
+			game.count--;
+			game.guesses.push(userInput);
+			// find the letter in answer, if found, also replace '_' with
+			// the letter in answerDisplay
+			var isFound = game.find(userInput);
+
+			// if letter is found in answer,
+			// and all letters match answer
+	
+			if (isFound && game.isMatched()) {
+				//console.log("isMatched: " + game.isMatched());
+				game.message = "You Won! Hit any key to restart.";
+				isNewNewGame = true;
+				isRestart = true;
+			} else if (game.count == 0) {
+				game.message = "You Lost! The answer is: " + game.answer.join("") +
+								"<br> Hit any key to restart";
+				isNewNewGame = true;
+				isRestart = true;
+			}
 		}
 	}
-
+	
 	display("#answer", game.answerDisplay.join(""));
 	display("#times", game.count);
 	display("#guessed", game.guesses);
