@@ -4,28 +4,58 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Hangman Game</title>
-	<link rel="stylesheet" href="assets/css/reset.css">
+	<!-- Bootstrap -->
+    <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-	<div id="hangman">
-		
-				
-		<div class="demoBox">
-			The Answer: <span id="answer"></span>
-		</div>
-		<div class="demoBox">
-			How many times left: <span id="times"></span>
-		</div>
-		<div class="demoBox">
-			<p>The letters you guessed:</p><span id="guessed"></span>
-		</div>
-		<div class="demoBox">
-			<span id="message"></span>
-		</div>
-
+<div class="container">
+	<div class="jumbotron text-center">
+		<h2>Hangman Game</h2>
+		<h3>Movie Trivia</h3>
+		<p>The game provides some hints of the movie. The answer is related to the movie. It can be the title, the leading actor's name or some event or place in the movie. Hit any key to start.</p>
 		
 	</div>
+
+	<div class="row">
+		<div class="col-sm-5">
+			<div class="jumbotron hangman">
+				<p><span id="hint"></span></p>
+			</div>
+		</div>
+		<div class="col-sm-7">
+			<div class="jumbotron hangman">			
+				<div class="well demoBox">
+					Answer: <span id="answer"></span>
+				</div>
+				<div class="well demoBox">
+					Number of Guesses Remaining: <span id="times"></span>
+				</div>
+				<div class="well demoBox">
+					Letters Already Guessed:<br><span id="guessed"></span>
+				</div>
+				<div class="well demoBox">
+					<span id="message"></span>
+				</div>				
+			</div>
+		</div>
+	</div>
+</div>
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
 
 	<script src="assets/javascript/game.js" type="text/javascript" charset="utf-8" async defer>
 	
