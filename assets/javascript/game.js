@@ -59,7 +59,7 @@ function postProcessing(game, result) {
 
 	if (movies.length == 0) {
 		gamesOver = true;
-		game.movie.hint = "<h2>Games Over</h2><p>Hit any key to restart";
+		game.movie.hint = "<h2>Game Over</h2><p>Hit any key to restart";
 	}
 	
 }
