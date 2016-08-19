@@ -118,7 +118,7 @@ function postProcessing(game, result) {
 	if (movies.length == 0) {
 		gamesOver = true;
 		game.movie.hint = "<h2>Game Over</h2>";
-		game.movie.hint += "<p>Hit any key to play these " + gameMovies.length + " questions again."
+		game.movie.hint += "<p>Hit any key to play these " + gameMovies.length + " questions again.</p>"
 	}
 	
 }
