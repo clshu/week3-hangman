@@ -1,19 +1,20 @@
 
 // Global Variables
-var isNewGame = true;
+var isNewGame = true; // One game for each word
 var randomIndex = -1;
 var userInput = '';
 var winCount = 0;
 var lossCount = 0;
-//var gameOver = false;
+var gamesOver = false;
+var movies = [];
+var firstTime = true;
 
 // Constant
 var maxGuessNumber = 20;
 var marker = '_'; // mark the positions that are not matched yet
 var winMessage = "You Won! Hit any key to restart.";
 var lossMessage = "You Lost! Hit any key to restart";
-var movies = [];
-var firstTime = true;
+
 // Functions
 function loadMovies() {
 	// deep copy
@@ -46,14 +47,21 @@ function postProcessing(game, result) {
 	message += "<br>Wins: " + winCount;
 	message += "  Losses: " + lossCount;
 	isNewGame = true;
-	// remove the movie that's been played
+	// Remove the movie that's been played
+	// because random number generator sometime is not
+	// that random and pick the same number very often
+	// Removing the played movie object will ensure it will not
+	// be picked again until all moives played out and start
+	// all over again
 	movies.splice(randomIndex, 1);
 	message += " Games Left: " + movies.length;
 	game.message = message;
 
 	if (movies.length == 0) {
 		// reload data
-		loadMovies();
+		//loadMovies();
+		gamesOver = true;
+		game.movie.hint = "<h2>Games Over</h2><p>Hit any key to restart";
 		//console.log("post:movie.length:" + movies.length);
 	}
 	
@@ -69,7 +77,7 @@ function getRandomInt(min, max) {
 
 // Class
 function Game(movie) {
-	this.movie = Object.assign({}, movie); // deep copys
+	this.movie = Object.assign({}, movie); // deep copy
 	this.answer = this.movie.answer.toLowerCase().split("");
 	this.guesses = []; // letters have been guessed stored here
 	this.answerDisplay = []; // holds matched letters or '_' with blanks in between
@@ -81,7 +89,7 @@ function Game(movie) {
 		// so every letter position is marked
 		// 
 		for (var i = 0; i < this.answer.length; i++) {
-			// set a [_,  , _,  ,..] array
+			// set a [_  _  _ ....] array
 			// insert a blank in betwen letters for display purpose
 			// so only even number positions hold letters or markers
 			this.answerDisplay.push(marker);
@@ -120,12 +128,20 @@ function Game(movie) {
 document.onkeyup = function(event) {
 
 	userInput = String.fromCharCode(event.keyCode).toLowerCase();
-
+	//console.log("firstTime 1:" + firstTime);
 	if (firstTime) {
+		//console.log("firstTime 2:" + firstTime);
 		loadMovies();
 		firstTime = false;
+		//console.log("firstTime 3:" + firstTime);
 	}
+	//console.log("firstTime 4:" + firstTime);
 
+	if (gamesOver) {
+		//Reload the page to restart the game
+		//all variables are reset to initial values
+		location.reload(true);
+	}
 	if (isNewGame) {
 		isNewGame = false;
 		randomIndex = getRandomInt(0, movies.length);
