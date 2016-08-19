@@ -97,7 +97,7 @@ function postProcessing(game, result) {
 	if (result == "win") {
 		winCount++;
 		message = winMessage;
-	} else if ("loss") {
+	} else if (result == "loss") {
 		lossCount++;
 		message = lossMessage;
 	} else {
