@@ -8,69 +8,13 @@ var lossCount = 0;
 var gamesOver = false;
 var movies = [];
 var firstTime = true;
+var gameMessage = '';
 
 // Constant
 var maxGuessNumber = 20;
 var marker = '_'; // mark the positions that are not matched yet
-var winMessage = "You Won! Hit any key to restart.";
-var lossMessage = "You Lost! Hit any key to restart";
-
-// Functions
-function loadMovies() {
-	// deep copy
-	for (var i = 0; i < gameMovies.length; i++) {
-		movies.push(gameMovies[i]);
-	}
-}
-function display(sel, html) {
-	document.querySelector(sel).innerHTML = html;
-}
-function formatGuesses(arr) {
-	var result = [];
-	for (var i = 0; i < arr.length; i++) {
-		result.push(arr[i].toUpperCase());
-		result.push(' ');
-	}
-	return result.join("");
-}
-function postProcessing(game, result) {
-	var message = '';
-	if (result == "win") {
-		winCount++;
-		message = winMessage;
-	} else if ("loss") {
-		lossCount++;
-		message = lossMessage;
-	} else {
-		message = "Argumnet error: " + result;
-	}
-	message += "<br>Wins: " + winCount;
-	message += "  Losses: " + lossCount;
-	isNewGame = true;
-	// Remove the movie that's been played
-	// because random number generator sometime is not
-	// that random and pick the same number very often
-	// Removing the played movie object will ensure it will not
-	// be picked again until all moives play out and start
-	// all over again
-	movies.splice(randomIndex, 1);
-	message += " Games Left: " + movies.length;
-	game.message = message;
-
-	if (movies.length == 0) {
-		gamesOver = true;
-		game.movie.hint = "<h2>Game Over</h2><p>Hit any key to restart";
-	}
-	
-}
-
-// Snippet from mozilla developer network
-// Generate random integer between min(included) and max (excluded)
-function getRandomInt(min, max) {
-	min = Math.ceil(min);
-	max = Math.floor(max);
-	return Math.floor(Math.random() * (max - min)) + min;
-}
+var winMessage = "<br>You Won! Hit any key to start a new game.";
+var lossMessage = "<br>You Lost! Hit any key to start a new game";
 
 // Class
 function Game(movie) {
@@ -120,6 +64,75 @@ function Game(movie) {
 	this.initialize();
 }
 
+
+// Functions
+function loadMovies() {
+	// deep copy
+	for (var i = 0; i < gameMovies.length; i++) {
+		movies.push(gameMovies[i]);
+	}
+}
+function display(sel, html) {
+	document.querySelector(sel).innerHTML = html;
+}
+function formatGuesses(arr) {
+	var result = [];
+	for (var i = 0; i < arr.length; i++) {
+		result.push(arr[i].toUpperCase());
+		result.push(' ');
+	}
+	return result.join("");
+}
+function createGameMessage(extra) {
+	var msg = '';
+	msg = "Wins: " + winCount;
+	msg +="  Losses: " + lossCount;
+	msg += " Games Left: " + movies.length;
+	msg += extra;
+
+	return msg; 
+}
+function postProcessing(game, result) {
+	var message = '';
+	if (result == "win") {
+		winCount++;
+		message = winMessage;
+	} else if ("loss") {
+		lossCount++;
+		message = lossMessage;
+	} else {
+		message = "Argumnet error: " + result;
+	}
+
+	isNewGame = true;
+	// Remove the movie that's been played
+	// because random number generator sometime is not
+	// that random and pick the same number very often
+	// Removing the played movie object will ensure it will not
+	// be picked again until all moives play out and start
+	// all over again
+	movies.splice(randomIndex, 1);
+
+	game.message = createGameMessage(message);
+
+	if (movies.length == 0) {
+		gamesOver = true;
+		game.movie.hint = "<h2>Game Over</h2>";
+		game.movie.hint += "<p>Hit any key to play these " + gameMovies.length + " questions again."
+	}
+	
+}
+
+// Snippet from mozilla developer network
+// Generate random integer between min(included) and max (excluded)
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min;
+}
+
+
+
 // Main Program
 
 document.onkeyup = function(event) {
@@ -143,14 +156,14 @@ document.onkeyup = function(event) {
 		game = new Game(movies[randomIndex]);
 		// Don't start to count the number, run game logic yet
 		// because this is a key stroke to start a new game
-		game.message = "Game started ...";
+		game.message = createGameMessage("<br>Game started ...");
 	
 	} else {
 
 		// if the letter has not been guessed, then run game logic
 		// otherwise, do nothing
 		if (game.isNotGuessed(userInput)) {
-			game.message = "Continuing ......";
+			game.message = createGameMessage("<br>Continuing ......");
 			game.count--;
 			game.guesses.push(userInput);
 			// find the letter in answer, if found, also replace marker with
